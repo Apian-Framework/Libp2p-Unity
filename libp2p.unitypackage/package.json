@@ -1,0 +1,17 @@
+{
+  "name": "com.apian-framework.libp2p-unity",
+  "version": "1.0.0",
+  "displayName": "libp2p for unity",
+  "description": "Native plugin for js-libp2p",
+  "unity": "2019.1",
+  "keywords": [
+    "libp2p",
+    "networking"
+  ],
+  "author": {
+    "name": "jim berry",
+    "email": "",
+    "url": "https://github.com/Apian-Framework"
+  },
+  "type": "library"
+}
