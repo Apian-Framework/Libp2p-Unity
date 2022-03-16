@@ -46,14 +46,13 @@ window.Libp2pObj = {
 }
 ```
 
-> **** NOTE: this is a bit of a crappy way to do this. It would be  better if browser-libp2p.js` was an ES module that had the object as a default export and the browser could import it like a modern browser does.
+ **** NOTE: this is a bit of a crappy way to do this. It would be  better if browser-libp2p.js` was an ES module that had the object as a default export and the browser could import it like a modern browser does.
 
-    My experiments with the parcel bundler, however, resulted in ES modules that had bizarre undefined symbol issues internal to the resulting module.
+>My experiments with the parcel bundler, however, resulted in ES modules that had bizarre undefined symbol issues internal to the resulting module.
 
->... or it would still be better if `browser-libp2p.js` set a global var instead of magically adding a property
-to `window`.
+... or it would still be better if `browser-libp2p.js` set a global var instead of magically adding a property to `window`.
 
-    Tried this, too - and was unable to get parcel to NOT mangle the resulting variable name.
+> Tried this, too - and was unable to get parcel to NOT mangle the resulting variable name.
 
 <br />
 
@@ -78,8 +77,8 @@ const { Libp2p,  Websockets, WebRTCStar,  NOISE,  Mplex,
 
 - I tried to be very specific in telling parcel what to do so it didn't have to try to infer so much, but never had any real success.
 
-  I only ever got it to work by setting it up the way it is - as if it were a completely minimal web app consisting of `index.html` and `browser-libp2p.js` and specifying almost nothing explicitly. Interestingly, set up this way it cannot build the web app. But it will build just the JS library if you type:
-   >`npx parcel build ./browser-libp2p.js`
+  I only ever got it to work by setting it up the way it is - as if it were a completely minimal web app consisting of `index.html` and `browser-libp2p.js` and specifying almost nothing explicitly. Interestingly, set up this way it cannot build the web app. But it will build just the JS library if you type:<br />
+   `npx parcel build ./browser-libp2p.js`
 
 - Be very careful messing with the dummy `index.html` file. If you, for instance, modify the import to be a "module" import it'll completely blow up the JS lib generation. Really.
 
