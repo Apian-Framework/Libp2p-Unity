@@ -1,6 +1,7 @@
 # browser-libp2p-specific stuff
 
 .parcel-cache
+.vscode
 
 dist/
 
