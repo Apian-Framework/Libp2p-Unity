@@ -6,35 +6,21 @@ using UnityEngine;
 namespace UnityLibp2p
 {
 
-    public class Libp2p : ILibp2p
+    public class Libp2p
     {
 
-        protected Libp2p()
-        {
-
-        }
-
-        // Static API
-        public static ILibp2p Create(string configName, string configOptions)
+        // Factory
+        public static ILibp2p Factory(ILibp2pClient client, object libp2pConfig)
         {
             // assumes there is a named configuration "configName" in the javascript code
 #if UNITY_WEBGL && !UNITY_EDITOR
-             return  WebGLLibp2p.CreateNamedConfig(configName, configOptions);
+             return  WebGLLibp2p.Factory(client, libp2pConfig);
 #else
             throw new NotImplementedException("Only WEBGL supported");
 #endif
 
         }
 
-
-//         public static ILibp2p create(Dictionary<string, object> options)
-//         {
-// #if WEBGL
-//             return new UnityWebGLLibp2p(options);
-// #endif
-
-//             return null;
-//         }
 
     }
 
