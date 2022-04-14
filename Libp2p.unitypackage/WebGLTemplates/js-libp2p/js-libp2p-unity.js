@@ -1,5 +1,5 @@
 
-import {Libp2p_configs} from './js-libp2p-configs.js'
+import {Libp2p_configs, ProcessConfig} from './js-libp2p-configs.js'
 
 const { Libp2p,  Websockets, WebRTCStar,  NOISE,  Mplex,
     Bootstrap,  GossipSub,  FloodSub, fromString, toString }  = window.Libp2pObj;
@@ -8,15 +8,25 @@ var JslibApiCallbacks = { }
 
 var ClientContexts = { }
 
+function EquivSets(setA, setB)
+{
+  return ( setA.size == setB.size
+    && [...setA].every(function (element) {
+      return setB.has(element);
+    })
+  )
+}
+
 export default  {
 
-  InitApiCallbacks: function( OnLibCreated_Cb, OnLibStarted_Cb, OnDiscovery_Cb,
-      OnConnection_Cb, OnMessage_Cb )
+  InitApiCallbacks: function( OnLibCreated_Cb, OnLibStarted_Cb,  OnDiscovery_Cb,  OnConnection_Cb,
+      OnListenAddr_Cb, OnMessage_Cb )
   {
     JslibApiCallbacks.OnLibCreated = OnLibCreated_Cb
     JslibApiCallbacks.OnLibStarted = OnLibStarted_Cb
     JslibApiCallbacks.OnDiscovery = OnDiscovery_Cb
     JslibApiCallbacks.OnConnection = OnConnection_Cb
+    JslibApiCallbacks.OnListenAddress = OnListenAddr_Cb,
     JslibApiCallbacks.OnMessage = OnMessage_Cb
   },
 
@@ -25,10 +35,10 @@ export default  {
     this.Create(clientId, Libp2p_configs[cfgName], cfgOpts);
   },
 
-  CreateFromConfig : async function(clientId, config)
+  CreateFromConfig : async function(clientId, configIn)
   {
-    var frob = config;
-   // this.Create(clientId, Libp2p_configs[cfgName], cfgOpts);
+    var fullConfig = ProcessConfig(configIn)
+    this.Create(clientId, fullConfig);
   },
 
   Create : async function(clientId, config)
@@ -41,12 +51,13 @@ export default  {
       version: 2,
       clientId: clientId,
       libp2pInst: libp2pInst,
-      subscribedTopics: []
+      subscribedTopics: [],
+      listenMaddrs: new Set()
     }
     ClientContexts[clientId] = ClientContext;
-		console.log(`**** Created Libp2p instance!!!`)
+		console.log(`Created Libp2p instance: ${clientId} LoalPeerId: ${libp2pInst.peerId.toB58String()}`)
 
-    JslibApiCallbacks.OnLibCreated(clientId);
+    JslibApiCallbacks.OnLibCreated(clientId, libp2pInst.peerId);
   },
 
   StartLib : async function(clientId)
@@ -55,7 +66,7 @@ export default  {
 
       // Listen for discovered peers
       ctx.libp2pInst.on('peer:discovery', (peer) => {
-        const peerIdStr = connection.remotePeer.toB58String();
+        const peerIdStr = peer.toB58String();
         console.log('Discovered %s', peerIdStr) // Log discovered peer
         JslibApiCallbacks.OnDiscovery(clientId, peerIdStr)
       })
@@ -69,27 +80,33 @@ export default  {
 
       // Listen for peers disconnecting
       ctx.libp2pInst.connectionManager.on('peer:disconnect', (connection) => {
-        const peerIdStr = connection.remotePeer.toB58String();
+        const peerIdStr = connection.remotePeer.toB58String()
         console.log(`Disconnected from ${peerIdStr}`)
         JslibApiCallbacks.OnConnection(clientId, peerIdStr,false)
       })
 
+      // If we bind to a relay or sentinel in order to be abel to have a "listen" address,
+      // this will fire with the peerId being our local peerid, and we need to report this
+      // back to the client app to tell it what our "listen" address(es) is/are
+      ctx.libp2pInst.peerStore.on('change:multiaddrs', ({ peerId }) => {
+        // Updated multiaddrs for this local node?
+        if (peerId.equals(ctx.libp2pInst.peerId)) {
+          var listenAddrs = new Set( ctx.libp2pInst.multiaddrs.map( maddr => maddr.toString()+'/p2p/'+peerId.toB58String() ) )
+          // This will get called when the addresses are still the same, so make sure they've changed
+          if ( !EquivSets(ctx.listenMaddrs, listenAddrs)) {
+            ctx.listenMaddrs = listenAddrs;
+
+            console.log(`Advertising listen addresses of ${listenAddrs}`)
+            JslibApiCallbacks.OnListenAddress(clientId,listenAddrs)
+          }
+
+        }
+      })
+
       await ctx.libp2pInst.start()
-      console.log(`**** Libp2p instance ${clientId} started!!!`)
 
       JslibApiCallbacks.OnLibStarted(clientId);
 
     },
 
-    // // callbacks from Javascript
-    // P2pNetJsLibp2p_OnConnection : function(clientId, peer) // called by JS so params are ok
-    // {
-    //     //console.log(`*** About to call Unity connection callback`)
-    //     const ctx = ClientContexts[clientId]
-    //     var c_clientId = allocate(intArrayFromString(clientId), ALLOC_NORMAL) // consider using emcripten stack mem utils?
-    //     var c_peer = allocate(intArrayFromString(peer), ALLOC_NORMAL)
-    //     dynCall_vii( ctx.connectionCallback, c_clientId, c_peer)
-    //     _free(c_clientId)
-    //     _free(c_peer)
-    // },
  }
