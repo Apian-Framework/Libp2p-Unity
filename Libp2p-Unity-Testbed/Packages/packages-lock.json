@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.apian-framework.libp2p-unity": {
-      "version": "file:../../libp2p.unitypackage",
+      "version": "file:E:/ConsenSys/Apian/code/Libp2p-Unity/Libp2p.unitypackage",
       "depth": 0,
       "source": "local",
       "dependencies": {}
