@@ -25,6 +25,12 @@ export default  {
     this.Create(clientId, Libp2p_configs[cfgName], cfgOpts);
   },
 
+  CreateFromConfig : async function(clientId, config)
+  {
+    var frob = config;
+   // this.Create(clientId, Libp2p_configs[cfgName], cfgOpts);
+  },
+
   Create : async function(clientId, config)
   {
     console.log(`CreateLib(): Type of passed-in clientID: ${typeof(clientId)} `)
