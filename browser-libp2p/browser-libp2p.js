@@ -7,6 +7,7 @@ import Mplex from 'libp2p-mplex'
 import Bootstrap from 'libp2p-bootstrap'
 import GossipSub from 'libp2p-gossipsub'
 import FloodSub from 'libp2p-floodsub'
+import { PeerId, createFromB58String } from 'peer-id'
 
 import {fromString} from 'uint8arrays/from-string'
 import {toString} from 'uint8arrays/to-string'
@@ -28,6 +29,7 @@ import {toString} from 'uint8arrays/to-string'
 // const { Libp2p,  Websockets, WebRTCStar,  NOISE,  Mplex,  Bootstrap,
 //         GossipSub,  FloodSub, fromString, toString } = window.Libp2pObj;
 
+
 window.Libp2pObj = {
   Libp2p: Libp2p,
   Websockets: Websockets,
@@ -39,6 +41,8 @@ window.Libp2pObj = {
   FloodSub: FloodSub,
   fromString: fromString,
   toString: toString,
+  PeerId: PeerId,
+  createFromB58String: createFromB58String
 }
 
 
