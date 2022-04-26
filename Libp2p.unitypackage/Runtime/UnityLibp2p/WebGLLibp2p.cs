@@ -26,7 +26,8 @@ namespace UnityLibp2p
 	    [DllImport("__Internal")]
 	    private static extern void JsLibp2p_InitCallbacks( Action<string, string> onCreatedCb, Action<string> onStartedCb,
             Action<string, string> onDiscoveryCb, Action<string, string, bool> onConnectionCb,
-            Action<string, string> onListenAddrCb, Action<string, string, string, string> onMessageCb  );
+            Action<string, string> onListenAddrCb, Action<string, string, string, string> onMessageCb,
+            Action<string> onStoppedCb, Action<string, string, int> onPingCb );
 
 
         // These declarations are ONLY to keep Emscripten from stripping these funcs.
@@ -40,6 +41,28 @@ namespace UnityLibp2p
         [DllImport("__Internal")]
         private static extern void JsLibp2p_StartLib(string instId);
 
+        [DllImport("__Internal")]
+        private static extern void JsLibp2p_StopLib(string instId);
+
+        [DllImport("__Internal")]
+        private static extern bool JsLibp2p_Subscribe(string instId, string topic);
+
+        [DllImport("__Internal")]
+        private static extern bool JsLibp2p_Unsubscribe(string instId, string topic);
+
+        [DllImport("__Internal")]
+        private static extern void JsLibp2p_Publish(string instId, string topic, string payload);
+
+        [DllImport("__Internal")]
+        private static extern bool JsLibp2p_Dial(string instId, string peerAddr);
+
+        [DllImport("__Internal")]
+        private static extern bool JsLibp2p_HangUp(string instId, string peerAddr);
+
+        [DllImport("__Internal")]
+        private static extern bool JsLibp2p_Ping(string instId, string peerAddr);
+
+        // callbacks
         [DllImport("__Internal")]
         private static extern void JsLibp2p_OnLibCreated( string clientId, string localPeerJson);
 
@@ -58,13 +81,18 @@ namespace UnityLibp2p
         [DllImport("__Internal")]
         private static extern void JsLibp2p_OnMessage(string libId, string sourceId, string topic, string message);
 
+        [DllImport("__Internal")]
+        private static extern void JsLibp2p_OnLibStopped(string libId);
+
+        [DllImport("__Internal")]
+        private static extern void JsLibp2p_OnPing(string libId, string peerAddr, int latencyMs);
 
         // Static ctor sets up JS callback pointers
         static WebGLLibp2p()
         {
             LibInstances = new Dictionary<string, WebGLLibp2p>();
-            JsLibp2p_InitCallbacks( JsLibp2p_OnLibCreated_Cb, JsLibp2p_OnLibStarted_Cb, JsLibp2p_OnDiscovery_Cb,
-                JsLibp2p_OnConnection_Cb, JsLibp2p_OnListenAddress_Cb, JsLibp2p_OnMessage_Cb );
+            JsLibp2p_InitCallbacks( JsLibp2p_OnLibCreated_Cb, JsLibp2p_OnLibStarted_Cb, JsLibp2p_OnDiscovery_Cb, JsLibp2p_OnConnection_Cb,
+            JsLibp2p_OnListenAddress_Cb, JsLibp2p_OnMessage_Cb, JsLibp2p_OnLibStopped_Cb, JsLibp2p_OnPing_Cb );
         }
 
         // Static callbacks from javascript
@@ -91,22 +119,22 @@ namespace UnityLibp2p
         }
 
         [MonoPInvokeCallback(typeof(Action<string, string>))]
-        public static void JsLibp2p_OnDiscovery_Cb(string libId, string peerId)
+        public static void JsLibp2p_OnDiscovery_Cb(string libId, string peerJson)
         {
-            Debug.Log($" JsLibp2p_OnDiscovery_Cb()! LibId: {libId} PeerId: {peerId}");
+            Debug.Log($" JsLibp2p_OnDiscovery_Cb()! LibId: {libId} PeerId: {peerJson}");
             try {
-                LibInstances[libId].OnPeerDiscovery(peerId);
+                LibInstances[libId].OnPeerDiscovery(peerJson);
             } catch (Exception ex) {
                 Debug.LogError(ex.Message);
             }
         }
 
         [MonoPInvokeCallback(typeof(Action<string, string, bool>))]
-        public static void JsLibp2p_OnConnection_Cb(string libId, string peerId, bool connected)
+        public static void JsLibp2p_OnConnection_Cb(string libId, string peerJson, bool connected)
         {
-            Debug.Log($"JsLibp2p_OnConnection_Cb() LibId: {libId} PeerId: {peerId} Connected: {connected}");
+            Debug.Log($"JsLibp2p_OnConnection_Cb() LibId: {libId} PeerId: {peerJson} Connected: {connected}");
             try {
-                LibInstances[libId].OnConnectionEvent(peerId, connected);
+                LibInstances[libId].OnConnectionEvent(peerJson, connected);
             } catch (Exception ex) {
                 Debug.LogError(ex.Message);
             }
@@ -134,6 +162,27 @@ namespace UnityLibp2p
             }
         }
 
+       [MonoPInvokeCallback(typeof(Action<string>))]
+        public static void JsLibp2p_OnLibStopped_Cb(string libId)
+        {
+            Debug.Log($"JsLibp2p_OnLibStopped_Cb() - LibId: {libId}");
+            try {
+                LibInstances[libId].OnStopped();
+            } catch (Exception ex) {
+                Debug.LogError(ex.Message);
+            }
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string, string, int>))]
+        public static void JsLibp2p_OnPing_Cb(string libId, string peerAddr, int latencyMs)
+        {
+            try {
+                LibInstances[libId].OnPing(peerAddr, latencyMs);
+            } catch (Exception ex) {
+                Debug.LogError(ex.Message);
+            }
+        }
+
         //
         // Factory
         //
@@ -145,9 +194,8 @@ namespace UnityLibp2p
             LibInstances[instanceId] = inst;
 
             Debug.Log($"WebGLLibp2p.Factory() Creating js-libp2p instance for {instanceId}");
-            JsLibp2p_CreateFromConfig(instanceId,  JsonConvert.SerializeObject(libp2pConfig));
 
-            //JsLibp2p_CreateFromNamedCfg(instanceId, "WebSocket_Bs_config", null);
+            JsLibp2p_CreateFromConfig(instanceId,  JsonConvert.SerializeObject(libp2pConfig));
 
             return inst;
         }
@@ -182,6 +230,8 @@ namespace UnityLibp2p
         public ILibp2pClient Client { get; private set; }
 
         public bool IsStarted { get; private set; }
+        public Libp2pPeerId PeerId { get; private set;}
+        public List<string> ListenAddrs {get; private set;}
 
         protected WebGLLibp2p(string instanceId, ILibp2pClient client)
         {
@@ -196,18 +246,50 @@ namespace UnityLibp2p
             JsLibp2p_StartLib(InstanceId);
         }
 
+        public void Stop()
+        {
+            JsLibp2p_StopLib(InstanceId); // does NOT delete anything. Just calls stop()
+        }
+
+        public bool Subscribe(string topic)
+        {
+            return JsLibp2p_Subscribe(InstanceId, topic);
+        }
+
+        public bool  Unsubscribe(string topic)
+        {
+            return JsLibp2p_Unsubscribe(InstanceId, topic);
+        }
+
+        public void Publish(string topic, string payload)
+        {
+            JsLibp2p_Publish(InstanceId, topic, payload);
+        }
+
+        public void Dial( string peerAddr)
+        {
+            JsLibp2p_Dial(InstanceId, peerAddr);
+        }
+
+        public void HangUp( string peerAddr)
+        {
+            JsLibp2p_HangUp(InstanceId, peerAddr);
+        }
+
+        public void Ping( string peerAddr)
+        {
+            JsLibp2p_Ping(InstanceId, peerAddr);
+        }
+
         // Client Callback "callers"
         protected void OnCreated(string localPeerJson)
         {
             Debug.Log($"WebGLLibp2p.OnCreated(): libId: {InstanceId}, localPeer: {localPeerJson}");
 
-            var peerFields = JsonConvert.DeserializeObject<Dictionary<string, string>>(localPeerJson);
+            var peerDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(localPeerJson);
+            Libp2pPeerId localPeer = Libp2pPeerId.FromDict(peerDict);
 
-            Libp2pPeerId localPeer = new Libp2pPeerId(
-                peerFields["id"],
-                peerFields.ContainsKey("pubKey") ? peerFields["pubKey"] : null,
-                peerFields.ContainsKey("privKey") ? peerFields["privKey"]: null );
-
+            PeerId = localPeer;
             Client.OnCreated(localPeer);
         }
 
@@ -215,31 +297,54 @@ namespace UnityLibp2p
         {
             IsStarted = true;
             Debug.Log($"WebGLLibp2p.OnStarted(): libId: {InstanceId}");
+            Client.OnStarted();
         }
 
-        protected void OnPeerDiscovery(string peerId)
+        protected void OnStopped()
+        {
+            IsStarted = false;
+            Debug.Log($"WebGLLibp2p.OnStopped(): libId: {InstanceId}");
+            Client.OnStopped();
+        }
+
+        protected void OnPeerDiscovery(string peerJson)
         {
             // TODO: also take multiaddress as an arg
+            var peerDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(peerJson);
+            Libp2pPeerId peerId = Libp2pPeerId.FromDict(peerDict);
             Debug.Log($"WebGLLibp2p.OnPeerDiscovery(): {peerId}");
+            Client.OnPeerDiscovery(peerId);
             // TODO: update list of known peers
         }
 
-        protected void OnConnectionEvent(string peerId, bool connected)
+        protected void OnConnectionEvent(string peerJson, bool connected)
         {
             // TODO: update known peers 'connected' property
+            var peerDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(peerJson);
+            Libp2pPeerId peerId = Libp2pPeerId.FromDict(peerDict);
             Debug.Log($"WebGLLibp2p.OnConnected(): {peerId} {(connected ? "Connected" : "Disconnected")}");
+            Client.OnConnectionEvent(peerId, connected);
         }
 
         protected void OnListenAddress(string addrArrayJson)
         {
             // TODO: update local peer "listenAddresses" property
-            var addrArray = JsonConvert.DeserializeObject<string[]>(addrArrayJson);
+            var addrList = JsonConvert.DeserializeObject<List<string>>(addrArrayJson);
+            ListenAddrs = addrList;
             Debug.Log($"WebGLLibp2p.OnListenAddress(): libId: {InstanceId}, listenAddresses: {addrArrayJson}");
+            Client.OnListenAddress( addrList );
         }
 
-        protected void OnMessage(string sourceId, string channel, string msgStr)
+        protected void OnMessage(string sourceId, string topic, string msgStr)
         {
             Debug.Log($"WebGLLibp2p.OnMessage()");
+            Client.OnMessage( sourceId, topic, msgStr);
+        }
+
+        protected void OnPing(string peerAddr, int latencyMs)
+        {
+            Debug.Log($"WebGLLibp2p.OnPing()");
+            Client.OnPing( peerAddr, latencyMs );
         }
 
     }

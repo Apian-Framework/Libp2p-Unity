@@ -7,10 +7,12 @@ namespace UnityLibp2p
     public  interface ILibp2pClient
     {
         void OnCreated(Libp2pPeerId localPeerId); // TODO Create a class for a libp2p peer
-        void OnStarted(); // args?
+        void OnStarted();
+        void OnStopped();
         void OnListenAddress(List<string> addresses);
-        void OnPeerDiscovery(string peerId); // TODO: maddrs?
-        void OnConnectionEvent(string peerId, bool connected);
-        void OnMessage(string sourceId, string channel, string payload);
+        void OnPeerDiscovery(Libp2pPeerId peerId); // TODO: maddrs?
+        void OnPing(string peerAddr, int latencyMs);
+        void OnConnectionEvent(Libp2pPeerId peerId, bool connected);
+        void OnMessage(string sourceId, string topic, string payload);
     }
 }

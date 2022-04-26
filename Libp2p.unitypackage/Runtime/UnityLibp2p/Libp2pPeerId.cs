@@ -27,6 +27,15 @@ namespace UnityLibp2p
                 (string)peerObj.GetType().GetProperty("id")?.GetValue(peerObj),
                 (string)peerObj.GetType().GetProperty("pubKey")?.GetValue(peerObj),
                 (string)peerObj.GetType().GetProperty("privKey")?.GetValue(peerObj) );
+
+        }
+
+        public static Libp2pPeerId FromDict(Dictionary<string, string> peerDict)
+        {
+            return new Libp2pPeerId(
+                peerDict["id"],
+                peerDict.ContainsKey("pubKey") ? peerDict["pubKey"] : null,
+                peerDict.ContainsKey("privKey") ? peerDict["privKey"]: null );
         }
 
     }
