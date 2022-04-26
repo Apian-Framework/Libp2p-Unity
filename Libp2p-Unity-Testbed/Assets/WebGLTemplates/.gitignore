@@ -1,0 +1,9 @@
+# 
+# The js-libp2p WebGL template should only be here as a copy.
+# It is configured in the Libp2pUnity unitypackage.
+# Unfortunately the Unity package manager doesn't know what to do
+# with a WebGL template in a package, so it has to be copied manually into
+# the project folder tree.
+#
+js-libp2p/
+js-libp2p.meta
