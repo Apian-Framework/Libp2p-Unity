@@ -25,7 +25,7 @@ public class WebsocketConnectTest : MonoBehaviour, ILibp2pClient
     // Start is called before the first frame update
     void Start()
     {
-        ConfigFld.text = JsonConvert.SerializeObject(Libp2pConfig.ExampleWebsocketsConfig, Formatting.Indented);
+        ConfigFld.text = Libp2pConfig.DefaultWebsocketConfig.ToJson();
         outScrollBar = OutputFld.transform.Find("Scrollbar").gameObject.GetComponent<UnityEngine.UI.Scrollbar>();
         TopicSel.ClearOptions();
     }
@@ -41,7 +41,7 @@ public class WebsocketConnectTest : MonoBehaviour, ILibp2pClient
     {
         Log("Connect pressed.");
 
-        object configObj = JsonConvert.DeserializeObject(ConfigFld.text);
+        Libp2pConfig configObj = Libp2pConfig.FromJson(ConfigFld.text);
 
         lib = Libp2p.Factory(this, configObj);
      }

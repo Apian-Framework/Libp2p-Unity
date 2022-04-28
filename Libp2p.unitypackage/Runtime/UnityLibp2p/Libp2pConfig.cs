@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace UnityLibp2p
@@ -23,6 +24,116 @@ namespace UnityLibp2p
         // But in practice are actually just contants. I'll put in a test in the JS to signal if they ever change,
         // but other than that am going to treat them as string constants here.
         public const string BootstrapTag = "bootstrap";
+
+        // config types
+        // Note that bools are represented as strings so 'null' is a possobel value meaning "don't serialize"
+        public const string bTRUE = "true";
+        public const string bFALSE = "false";
+
+        public class Addresses {
+            public List<string> listen;
+        }
+
+        public class Modules {
+            public List<string> transport;
+            public List<string> connEncryption;
+            public List<string> streamMuxer;
+            public List<string> peerDiscovery;
+            public string pubsub;
+        }
+
+        public class BootstrapPDConfig {
+            public string enabled;
+            public List<string> list;
+
+        }
+        public class WebRTCStarPDConfig {
+            public string enabled;
+        }
+
+        public class PeerDiscoveryConfig {
+            public string autoDial;
+            public BootstrapPDConfig bootstrap;
+            public WebRTCStarPDConfig webRTCStar;
+        }
+
+         public class PubSubConfig {
+            public string enabled;
+            public string emitSelf;
+        }
+
+        public class AutoRelayConfig {
+            public string enabled;
+            public int maxListeners; //
+        }
+
+       public class HopConfig {
+            public string enabled;
+        }
+
+
+        public class RelayConfig {
+            public string enabled;
+            public AutoRelayConfig autoRelay;
+             public HopConfig hop;
+        }
+
+        public class Config {
+            public PeerDiscoveryConfig peerDiscovery;
+            public PubSubConfig pubsub;
+            public RelayConfig relay;
+
+        }
+
+
+        // Properties
+        public Libp2pPeerId peerId;
+        public Addresses addresses;
+        public Modules modules;
+        public Config config;
+
+        public string ToJson() =>  JsonConvert.SerializeObject(this,  Formatting.Indented,
+            new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
+
+        public static Libp2pConfig FromJson(string json) => JsonConvert.DeserializeObject<Libp2pConfig>(json);
+
+
+        // static exmaple/defaults
+        public static Libp2pConfig DefaultWebsocketConfig = new Libp2pConfig() {
+            peerId = null,
+            addresses = new Addresses(),
+            modules = new Modules() {
+                transport = new List<string>() {Websockets},
+                connEncryption = new List<string>() {NOISE},
+                streamMuxer =  new List<string>() {Mplex},
+                peerDiscovery = new List<string>() { Bootstrap },
+                pubsub = GossipSub
+            },
+            config = new Config() {
+                peerDiscovery = new PeerDiscoveryConfig() {
+                    autoDial = bTRUE,
+                    bootstrap = new BootstrapPDConfig() {
+                        enabled = bTRUE,
+                        list = new List<string>() { "bootstrapAddr1" } // Must be replaced before submitting
+                    }
+                },
+                pubsub = new PubSubConfig() {
+                    enabled = bTRUE,
+                    emitSelf = bTRUE
+                },
+                relay = new RelayConfig {
+                    enabled = bTRUE,
+                    autoRelay = new AutoRelayConfig {
+                        enabled = bTRUE,
+                        maxListeners = 2
+                    },
+                    hop = new HopConfig {
+                        enabled = bTRUE
+                    }
+                }
+            }
+        };
+
 
          public static object ExampleFullLiteralConfig => new {
             peerId = new {

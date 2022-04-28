@@ -10,13 +10,13 @@ namespace UnityLibp2p
     {
 
         // Factory
-        public static ILibp2p Factory(ILibp2pClient client, object libp2pConfig)
+        public static ILibp2p Factory(ILibp2pClient client, Libp2pConfig config)
         {
             // assumes there is a named configuration "configName" in the javascript code
-#if UNITY_WEBGL && !UNITY_EDITOR
-             return  WebGLLibp2p.Factory(client, libp2pConfig);
+#if  UNITY_WEBGL && !UNITY_EDITOR
+            return  WebGLLibp2p.Factory(client, config);
 #else
-            throw new NotImplementedException("Only WEBGL supported");
+           throw new NotImplementedException("Only WEBGL supported");
 #endif
 
         }

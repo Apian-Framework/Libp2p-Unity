@@ -186,7 +186,7 @@ namespace UnityLibp2p
         //
         // Factory
         //
-        public static ILibp2p Factory(ILibp2pClient client, object libp2pConfig)
+        public static ILibp2p Factory(ILibp2pClient client, Libp2pConfig config)
         {
             string instanceId = Guid.NewGuid().ToString();
 
@@ -195,7 +195,7 @@ namespace UnityLibp2p
 
             Debug.Log($"WebGLLibp2p.Factory() Creating js-libp2p instance for {instanceId}");
 
-            JsLibp2p_CreateFromConfig(instanceId,  JsonConvert.SerializeObject(libp2pConfig));
+            JsLibp2p_CreateFromConfig(instanceId,  config.ToJson());
 
             return inst;
         }
