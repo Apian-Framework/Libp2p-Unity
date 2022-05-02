@@ -7,6 +7,7 @@ import Mplex from 'libp2p-mplex'
 import Bootstrap from 'libp2p-bootstrap'
 import GossipSub from 'libp2p-gossipsub'
 import FloodSub from 'libp2p-floodsub'
+//import PubSubPeerDiscovery from '@libp2p/pubsub-peer-discovery'
 import { PeerId, createFromB58String } from 'peer-id'
 
 import {fromString} from 'uint8arrays/from-string'
@@ -37,6 +38,7 @@ window.Libp2pObj = {
   NOISE: NOISE,
   Mplex: Mplex,
   Bootstrap: Bootstrap,
+ // PubSubPeerDiscovery: PubSubPeerDiscovery,
   GossipSub: GossipSub,
   FloodSub: FloodSub,
   fromString: fromString,
