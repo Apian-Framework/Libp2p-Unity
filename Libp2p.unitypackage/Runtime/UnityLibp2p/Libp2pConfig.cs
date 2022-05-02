@@ -26,9 +26,6 @@ namespace UnityLibp2p
         public const string BootstrapTag = "bootstrap";
 
         // config types
-        // Note that bools are represented as strings so 'null' is a possobel value meaning "don't serialize"
-        public const string bTRUE = "true";
-        public const string bFALSE = "false";
 
         public class Addresses {
             public List<string> listen;
@@ -43,37 +40,37 @@ namespace UnityLibp2p
         }
 
         public class BootstrapPDConfig {
-            public string enabled;
+            public bool enabled = true;
             public List<string> list;
 
         }
         public class WebRTCStarPDConfig {
-            public string enabled;
+            public bool enabled = true;
         }
 
         public class PeerDiscoveryConfig {
-            public string autoDial;
+            public bool autoDial = false;  // Defaults to FALSE!
             public BootstrapPDConfig bootstrap;
             public WebRTCStarPDConfig webRTCStar;
         }
 
          public class PubSubConfig {
-            public string enabled;
-            public string emitSelf;
+            public bool enabled = true;
+            public bool emitSelf = false;
         }
 
         public class AutoRelayConfig {
-            public string enabled;
-            public int maxListeners; //
+            public bool enabled = true;
+            public int maxListeners = 2;
         }
 
        public class HopConfig {
-            public string enabled;
+            public bool enabled = true;
         }
 
 
         public class RelayConfig {
-            public string enabled;
+            public bool enabled = true;
             public AutoRelayConfig autoRelay;
              public HopConfig hop;
         }
@@ -111,24 +108,24 @@ namespace UnityLibp2p
             },
             config = new Config() {
                 peerDiscovery = new PeerDiscoveryConfig() {
-                    autoDial = bTRUE,
+                    autoDial = true,
                     bootstrap = new BootstrapPDConfig() {
-                        enabled = bTRUE,
-                        list = new List<string>() { "bootstrapAddr1" } // Must be replaced before submitting
+                        enabled = true,
+                        list = new List<string>() { "REPLACE_WITH_MULTIADDR" } // Must be replaced before submitting
                     }
                 },
                 pubsub = new PubSubConfig() {
-                    enabled = bTRUE,
-                    emitSelf = bTRUE
+                    enabled = true,
+                    emitSelf = false
                 },
                 relay = new RelayConfig {
-                    enabled = bTRUE,
+                    enabled = true,
                     autoRelay = new AutoRelayConfig {
-                        enabled = bTRUE,
+                        enabled = true,
                         maxListeners = 2
                     },
                     hop = new HopConfig {
-                        enabled = bTRUE
+                        enabled = true
                     }
                 }
             }
