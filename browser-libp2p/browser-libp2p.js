@@ -31,7 +31,28 @@ import {toString} from 'uint8arrays/to-string'
 //         GossipSub,  FloodSub, fromString, toString } = window.Libp2pObj;
 
 
-window.Libp2pObj = {
+// window.Libp2pObj = {
+//   Libp2p: Libp2p,
+//   Websockets: Websockets,
+//   WebRTCStar: WebRTCStar,
+//   NOISE: NOISE,
+//   Mplex: Mplex,
+//   Bootstrap: Bootstrap,
+//   GossipSub: GossipSub,
+//   FloodSub: FloodSub,
+//   fromString: fromString,
+//   toString: toString,
+//   PeerId: PeerId,
+//   createFromB58String: createFromB58String
+// }
+
+// Method #3: Import ES Module-style
+//    <script type="module" >
+//        import Libp2pObj from "./browser-libp2p.js"
+//    </script>
+//
+
+export const Libp2pObj = {
   Libp2p: Libp2p,
   Websockets: Websockets,
   WebRTCStar: WebRTCStar,
@@ -46,5 +67,3 @@ window.Libp2pObj = {
   PeerId: PeerId,
   createFromB58String: createFromB58String
 }
-
-

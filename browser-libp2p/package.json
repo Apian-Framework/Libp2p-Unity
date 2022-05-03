@@ -2,17 +2,24 @@
   "name": "browser-libp2p",
   "version": "1.0.0",
   "description": "browserified libp2p",
-  "browserslist": [
-    "last 2 Chrome versions"
-  ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "parcel build index.html",
-    "start": "parcel index.html"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "source": "browser-libp2p.js",
+  "module": "dist/browser-libp2p.js",
+  "browserslist": [
+    "last 2 Chrome versions"
+  ],
+  "targets": {
+    "module": {
+      "includeNodeModules": true
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "parcel build ./browser-libp2p.js",
+    "start": "parcel ./index.html"
+  },
   "dependencies": {
     "@chainsafe/libp2p-noise": "^5.0.2",
     "babel-polyfill": "^6.26.0",
@@ -24,6 +31,7 @@
     "libp2p-mplex": "^0.10.4",
     "libp2p-webrtc-star": "^0.25.0",
     "libp2p-websockets": "^0.16.1",
+    "peer-id": "^0.16.0",
     "uint8arrays": "^3.0.0"
   },
   "devDependencies": {
@@ -31,7 +39,7 @@
     "@babel/core": "^7.13.0",
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-regenerator": "^6.26.0",
-    "parcel": "^2.0.1",
-    "process": "^0.11.10"
+    "parcel": "^2.5.0"
+
   }
 }
