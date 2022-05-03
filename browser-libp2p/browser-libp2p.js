@@ -10,8 +10,8 @@ import FloodSub from 'libp2p-floodsub'
 import PubsubPeerDiscovery from 'libp2p-pubsub-peer-discovery'
 import { PeerId, createFromB58String } from 'peer-id'
 
-import {fromString} from 'uint8arrays/from-string'
-import {toString} from 'uint8arrays/to-string'
+import {fromString as uint8arrayFromString} from 'uint8arrays/from-string'
+import {toString as uint8arrayToString} from 'uint8arrays/to-string'
 
 // Method #1: put directly into browser global scope
 // window.Libp2p = Libp2p
@@ -41,8 +41,8 @@ window.Libp2pObj = {
   PubsubPeerDiscovery: PubsubPeerDiscovery,
   GossipSub: GossipSub,
   FloodSub: FloodSub,
-  fromString: fromString,
-  toString: toString,
+  uint8arrayFromString: uint8arrayFromString,
+  uint8arrayToString: uint8arrayToString,
   PeerId: PeerId,
   createFromB58String: createFromB58String
 }

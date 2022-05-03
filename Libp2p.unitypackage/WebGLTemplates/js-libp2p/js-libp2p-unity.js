@@ -1,8 +1,8 @@
 
 import {Libp2p_configs, ProcessConfig} from './js-libp2p-configs.js'
 
-const { Libp2p,  Websockets, WebRTCStar,  NOISE,  Mplex,
-    Bootstrap,  GossipSub,  FloodSub, fromString, toString, PeerId, createFromB58String }  = window.Libp2pObj;
+const { Libp2p,  Websockets, WebRTCStar,  NOISE,  Mplex,  Bootstrap,  PubsubPeerDiscovery, GossipSub,  FloodSub,
+    uint8arrayFromString, uint8arrayToString, PeerId, createFromB58String }  = window.Libp2pObj;
 
 var JslibApiCallbacks = { }
 
@@ -155,8 +155,8 @@ export default  {
       // Need to assign the bound handler to a ctx property so we can
       ctx.libp2pInst.pubsub.on( topic, ctx.msgHandlers[topic] = (msg) => {
           // msg is: { from: string, data: Uint8Array, seqno: Uint8Array, topicIDs: Array<string>, signature: Uint8Array, key: Uint8Array }
-          console.log(`Got pubsub msg. From: ${msg.from} Topic: ${topic} Payload: ${toString(msg.data)}`)
-          JslibApiCallbacks.OnMessage( ctx.clientId, msg.from, topic, toString(msg.data) )
+          console.log(`Got pubsub msg. From: ${msg.from} Topic: ${topic} Payload: ${uint8arrayToString(msg.data)}`)
+          JslibApiCallbacks.OnMessage( ctx.clientId, msg.from, topic, uint8arrayToString(msg.data) )
       })
       ctx.libp2pInst.pubsub.subscribe(topic)
       ctx.subscribedTopics.push(topic)
@@ -183,7 +183,7 @@ export default  {
     Publish : async function(clientId, topic, message)
     {
       var ctx = ClientContexts[clientId]
-      const data = fromString(message)
+      const data = uint8arrayFromString(message)
       await ctx.libp2pInst.pubsub.publish(topic, data)
     },
 

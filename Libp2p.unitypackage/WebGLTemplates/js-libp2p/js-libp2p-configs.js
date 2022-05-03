@@ -1,5 +1,5 @@
-const { Libp2p,  Websockets, WebRTCStar,  NOISE,  Mplex,
-    Bootstrap,  GossipSub,  FloodSub, fromString, toString }  = window.Libp2pObj;
+const { Libp2p,  Websockets, WebRTCStar,  NOISE,  Mplex,  Bootstrap,  PubsubPeerDiscovery, GossipSub,  FloodSub,
+      uint8arrayFromString, uint8arrayToString, PeerId, createFromB58String }  = window.Libp2pObj;
 
 // String constants that might need replacing
 // These must be that same as the corresponding C# definitions
@@ -7,7 +7,10 @@ const  Websockets_Lbl = "Websockets-inst", WebRTCStar_Lbl = "WebRTCStar-inst" //
 const  NOISE_Lbl = "NOISE-inst"  // encryption
 const  Mplex_Lbl = "Mplex-inst"  // stream multiplexer
 const  Bootstrap_Lbl = "Bootstrap-inst"  // PeerDiscovery  modules
+const  PubsubPeerDiscovery_Lbl = "PubsubPeerDiscovery-inst"
+
 const  GossipSub_Lbl = "GossipSub-inst", Floodsub_Lbl = "Floodsub-inst" // pubsub modules
+
 
 class Libp2pConfigError extends Error {
   constructor(message) {
@@ -28,6 +31,9 @@ function CheckConfigTags()
   // Anyways - the idea here is to make sure that any that we actually use in C# are still what we think they are...
   if (Bootstrap.tag !== "bootstrap") // used to config bootstrap PeerDiscovery
     throw new Libp2pConfigError("Bootstrap.tag is not 'bootstrap'");
+
+  if (PubsubPeerDiscovery.tag !== "PubsubPeerDiscovery")
+    throw new Libp2pConfigError("PubsubPeerDiscovery.tag is not 'PubsubPeerDiscovery'");
 }
 
 
@@ -108,12 +114,22 @@ function ConfigMux(inConf)
 
 function ConfigPeerDiscovery(inConf)
 {
+  var discoveryInstances = {
+    [Bootstrap_Lbl]: Bootstrap,
+    [PubsubPeerDiscovery_Lbl]: PubsubPeerDiscovery
+  }
+
   var peerDiscovery = []
 
-  if (inConf.includes(Bootstrap_Lbl))
-    peerDiscovery.push(Bootstrap)
-  else
-    throw new Libp2pConfigError(`No supported peerDiscovery modules in \"${JSON.stringify(inConf)}\"`)
+  inConf.forEach( (label) => {
+    if (discoveryInstances.hasOwnProperty(label))
+    peerDiscovery.push(discoveryInstances[label])
+    else
+      throw new Libp2pConfigError(`Peer discovery "${label}" not supported`)
+  })
+
+  if (peerDiscovery.length === 0)
+      throw new Libp2pConfigError(`No supported peer dicovery methods in \"${JSON.stringify(inConf)}\"`)
 
   return peerDiscovery
 }
