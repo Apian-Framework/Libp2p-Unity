@@ -17,6 +17,8 @@ namespace UnityLibp2p
         public const string NOISE = "NOISE-inst"; // encryption
         public const string Mplex = "Mplex-inst"; // stream multiplexer
         public const string Bootstrap = "Bootstrap-inst";  // PeerDiscovery  modules
+        public const string PubsubPeerDiscovery = "PubsubPeerDiscovery-inst";  // PeerDiscovery  modules
+
         public const string GossipSub = "GossipSub-inst", Floodsub = "Floodsub-inst"; // pubsub modules
 
         // Config tags:
@@ -24,6 +26,9 @@ namespace UnityLibp2p
         // But in practice are actually just contants. I'll put in a test in the JS to signal if they ever change,
         // but other than that am going to treat them as string constants here.
         public const string BootstrapTag = "bootstrap";
+        public const string PubsubDiscoveryTag = "PubsubPeerDiscovery";
+
+        public const string DefaultPubsubDiscoveryTopic = "_peer-discovery._p2p._pubsub";
 
         // config types
 
@@ -42,16 +47,23 @@ namespace UnityLibp2p
         public class BootstrapPDConfig {
             public bool enabled = true;
             public List<string> list;
-
         }
         public class WebRTCStarPDConfig {
             public bool enabled = true;
+        }
+
+        public class PubsubPDConfig {
+            public bool enabled = true;
+            public int interval = 10000;
+            public List<string> topics =  new List<string>() { DefaultPubsubDiscoveryTopic };
+            public bool listenOnly = false;
         }
 
         public class PeerDiscoveryConfig {
             public bool autoDial = false;  // Defaults to FALSE!
             public BootstrapPDConfig bootstrap;
             public WebRTCStarPDConfig webRTCStar;
+            public PubsubPDConfig PubsubPeerDiscovery;
         }
 
          public class PubSubConfig {
@@ -103,7 +115,7 @@ namespace UnityLibp2p
                 transport = new List<string>() {Websockets},
                 connEncryption = new List<string>() {NOISE},
                 streamMuxer =  new List<string>() {Mplex},
-                peerDiscovery = new List<string>() { Bootstrap },
+                peerDiscovery = new List<string>() { Bootstrap, PubsubPeerDiscovery },
                 pubsub = GossipSub
             },
             config = new Config() {
@@ -112,7 +124,9 @@ namespace UnityLibp2p
                     bootstrap = new BootstrapPDConfig() {
                         enabled = true,
                         list = new List<string>() { "REPLACE_WITH_MULTIADDR" } // Must be replaced before submitting
-                    }
+                    },
+
+                    PubsubPeerDiscovery = new PubsubPDConfig() // defaults
                 },
                 pubsub = new PubSubConfig() {
                     enabled = true,
