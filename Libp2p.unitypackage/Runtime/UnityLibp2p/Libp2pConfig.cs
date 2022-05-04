@@ -122,7 +122,7 @@ namespace UnityLibp2p
                 peerDiscovery = new PeerDiscoveryConfig() {
                     autoDial = true,
                     bootstrap = new BootstrapPDConfig() {
-                        enabled = true,
+                        enabled = false, // change this and add address(es) to use
                         list = new List<string>() { "REPLACE_WITH_MULTIADDR" } // Must be replaced before submitting
                     },
 
@@ -145,6 +145,8 @@ namespace UnityLibp2p
             }
         };
 
+/*
+        This is all old-style anonymous-object definietion. I just kept them around for reference (for now)
 
          public static object ExampleFullLiteralConfig => new {
             peerId = new {
@@ -257,5 +259,6 @@ namespace UnityLibp2p
         };
 
     }
+*/
 
 }
