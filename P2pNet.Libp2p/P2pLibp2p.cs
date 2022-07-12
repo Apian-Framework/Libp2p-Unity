@@ -30,7 +30,7 @@ namespace P2pNet
 
             // {  "relaybase":"<relatBaseMaddr>"
             //    "relayid":<relay connect peerId>
-            //    "dialid":<pubsub peer id>
+            //    "dialid":<pubsub peer id>  <== ignore this
             // }
             connectOpts = JsonConvert.DeserializeObject<Dictionary<string,string>>(_connectionString);
 
@@ -62,6 +62,7 @@ namespace P2pNet
 
             Libp2pConfig configObj = Libp2pConfig.DefaultWebsocketConfig ; // by default
 
+            configObj.config.peerDiscovery.bootstrap.enabled = true;
             configObj.config.peerDiscovery.bootstrap.list[0] = connectOpts["relaybase"]+connectOpts["relayid"];
 
             mainChannelInfo = mainChannel;
@@ -171,14 +172,8 @@ namespace P2pNet
                 {
                     ListenAddress = addresses[0];
 
-                    if (connectOpts["dialid"] == "")
-                    {
-                        _reportConnectedToNet();
-                    } else{
-                        // TODO: this all assumes dialId's maddr is relaybase+dialid.
-                        // This might not be true
-                        lib.Dial(connectOpts["relaybase"]+connectOpts["dialid"]); // wait until we are connected to another peer
-                    }
+                    _reportConnectedToNet();
+
                 }
             }
         }
@@ -189,17 +184,17 @@ namespace P2pNet
         public void OnConnectionEvent(Libp2pPeerId peerId, bool connected)
         {
             //Log( $"\n{(connected ? "Connected to" : "Disconnected from")}  remote peer: {peerId.id}");
-            if ( connected == true)
-            {
-                if (IsConnected == false)
-                {
-                    if (peerId.id == connectOpts["dialid"])
-                    {
-                        // we are now connected to a pubsub peer so can start talking
-                        _reportConnectedToNet();
-                    }
-                }
-            }
+            // if ( connected == true)
+            // {
+            //     if (IsConnected == false)
+            //     {
+            //         if (peerId.id == connectOpts["dialid"])
+            //         {
+            //             // we are now connected to a pubsub peer so can start talking
+            //             _reportConnectedToNet();
+            //         }
+            //     }
+            // }
 
         }
         public void OnMessage(string sourceId, string topic, string payload)
