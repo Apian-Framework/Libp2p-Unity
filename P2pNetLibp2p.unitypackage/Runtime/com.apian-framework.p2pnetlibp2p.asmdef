@@ -1,0 +1,21 @@
+{
+    "name": "com.apian-framework.p2pnetlibp2p",
+    "rootNamespace": "",
+    "references": [
+        "P2pNet",
+        "UniLog",
+        "UnityLibp2p"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll",
+        "com.apian-framework.libp2punity"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

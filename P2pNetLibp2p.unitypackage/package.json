@@ -1,0 +1,17 @@
+{
+  "name": "com.apian-framework.p2pnetlibp2p",
+  "version": "1.0.0",
+  "displayName": "P2pNet.Libp2p",
+  "description": "P2pNet with Libp2p carrier",
+  "unity": "2019.1",
+  "keywords": [
+    "libp2p",
+    "networking"
+  ],
+  "author": {
+    "name": "jim berry",
+    "email": "",
+    "url": "https://github.com/Apian-Framework"
+  },
+  "type": "library"
+}
