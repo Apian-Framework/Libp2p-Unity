@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityLibp2p
+namespace Libp2pUnity
 {
     public  interface ILibp2pClient
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace UnityLibp2p
+namespace Libp2pUnity
 {
     public class Libp2pConfig
     {

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityLibp2p
+namespace Libp2pUnity
 {
     // Creation is done via
     // static ILibp2p <Implementation>.Factory(ILibp2pClient clientInst, object libp2pConfigObj)

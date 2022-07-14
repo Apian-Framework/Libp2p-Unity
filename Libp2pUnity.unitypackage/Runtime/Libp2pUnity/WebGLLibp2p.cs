@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using AOT;
 #endif
 
-namespace UnityLibp2p
+namespace Libp2pUnity
 {
 
 #if UNITY_WEBGL

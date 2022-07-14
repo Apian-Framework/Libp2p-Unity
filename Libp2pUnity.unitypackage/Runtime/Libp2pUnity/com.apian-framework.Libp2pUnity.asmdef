@@ -1,5 +1,5 @@
 {
-    "name": "UnityLibp2p",
+    "name": "com.apian-framework.libp2punity",
     "references": [
     ],
     "includePlatforms": [],

@@ -1,5 +1,5 @@
 {
-  "name": "com.apian-framework.libp2p-unity",
+  "name": "com.apian-framework.libp2punity",
   "version": "1.0.0",
   "displayName": "Libp2p for Unity",
   "description": "Native plugin for js-libp2p",
