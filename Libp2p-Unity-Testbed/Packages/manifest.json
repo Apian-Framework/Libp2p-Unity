@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.apian-framework.libp2p-unity": "file:../../Libp2p.unitypackage",
+    "com.apian-framework.libp2punity": "file:../../Libp2pUnity.unitypackage",
     "com.unity.collab-proxy": "1.15.7",
     "com.unity.feature.development": "1.0.1",
     "com.unity.ide.rider": "3.0.9",

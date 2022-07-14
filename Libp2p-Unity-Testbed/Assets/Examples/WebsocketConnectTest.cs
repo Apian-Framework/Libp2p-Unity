@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using Newtonsoft.Json;
-using UnityLibp2p;
+using Libp2pUnity;
 
 public class WebsocketConnectTest : MonoBehaviour, ILibp2pClient
 {
