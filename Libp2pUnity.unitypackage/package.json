@@ -13,5 +13,12 @@
     "email": "",
     "url": "https://github.com/Apian-Framework"
   },
-  "type": "library"
+  "type": "library",
+  "samples": [
+          {
+            "displayName": "js-libp2p WEGL Template",
+            "description": "Demo WEBGL template for js-libp2p",
+            "path": "Samples~/WebGLTemplates/js-libp2p"
+        }
+  ]
 }
