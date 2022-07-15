@@ -1,7 +1,7 @@
 {
     "name": "com.apian-framework.libp2punity",
-    "references": [
-    ],
+    "rootNamespace": "",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
