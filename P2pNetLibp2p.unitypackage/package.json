@@ -13,5 +13,6 @@
     "email": "",
     "url": "https://github.com/Apian-Framework"
   },
-  "type": "library"
+  "type": "library",
+  "dependencies": {}
 }

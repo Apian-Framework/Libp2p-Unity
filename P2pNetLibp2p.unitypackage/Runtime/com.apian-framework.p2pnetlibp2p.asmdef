@@ -4,7 +4,7 @@
     "references": [
         "P2pNet",
         "UniLog",
-        "UnityLibp2p"
+        "com.apian-framework.libp2punity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
