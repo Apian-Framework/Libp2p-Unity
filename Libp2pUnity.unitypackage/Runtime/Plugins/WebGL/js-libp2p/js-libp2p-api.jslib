@@ -63,7 +63,7 @@ var JsLibp2pAPI = {
       var clientId = UTF8ToString(c_clientId)
       var topic = UTF8ToString(c_topic)
 	   var success = JsLibp2p.Subscribe(clientId, topic)
-      console.log(`JsLibp2p_Subscribe() ${success?"succeeded":"failed"}`)
+      console.log(`JsLibp2p_Subscribe(${topic}) ${success?"succeeded":"failed"}`)
       return success
    },
 
@@ -73,7 +73,7 @@ var JsLibp2pAPI = {
       var clientId = UTF8ToString(c_clientId)
       var topic = UTF8ToString(c_topic)
 	   var success =  JsLibp2p.Unsubscribe(clientId, topic)
-      console.log(`JsLibp2p_Unsubscribe() ${success?"succeeded":"failed"}`)
+      console.log(`JsLibp2p_Unsubscribe(${topic}) ${success?"succeeded":"failed"}`)
       return success
    },
 

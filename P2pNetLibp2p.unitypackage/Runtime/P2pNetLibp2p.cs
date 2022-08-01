@@ -16,6 +16,11 @@ using P2pNet;
             public IP2pNetBase p2pBase;
             public P2pNetChannelInfo mainChannel;
             public string localHelloData;
+            public string ListenAddress;
+
+            public Libp2pPeerId localLibp2pId;
+            public bool IsConnected;
+            public bool HasPeers; // are we connected to anyone subscribed to the main channel?
         };
 
         private JoinState joinState;
@@ -25,11 +30,6 @@ using P2pNet;
         private readonly Dictionary<string,string> connectOpts;
 
 
-        public Libp2pPeerId localLibp2pId;
-
-        public string ListenAddress { get; private set; }
-
-        public bool IsConnected { get; private set;}
 
 
         public UniLogger logger;
@@ -38,7 +38,7 @@ using P2pNet;
         {
             logger = UniLogger.GetLogger("P2pNet");
 
-            // {  "relaybase":"<relatBaseMaddr>"
+            // {  "relaybase":"<relayBaseMaddr>"
             //    "relayid":<relay connect peerId>
             //    "dialid":<pubsub peer id>  <== ignore this
             // }
@@ -66,7 +66,11 @@ using P2pNet;
                 p2pBase=p2pBase,
                 mainChannel=mainChannel,
                 localHelloData=localHelloData,
-                mainSyncCtx = SynchronizationContext.Current
+                mainSyncCtx = SynchronizationContext.Current,
+                ListenAddress = null,
+                localLibp2pId = null,
+                HasPeers = false,
+                IsConnected = false
             };
 
             lib = Libp2p.Factory(this, configObj);
@@ -114,7 +118,7 @@ using P2pNet;
         {
             if (!lib.IsStarted)
             {
-                localLibp2pId = localPeer;
+                joinState.localLibp2pId = localPeer;
                 lib.Start();
 
                 // results (async) in OnStarted
@@ -135,8 +139,9 @@ using P2pNet;
 
         protected void _reportConnectedToNet()
         {
-            IsConnected = true;
             Listen(joinState.p2pBase.GetId());
+
+            joinState.IsConnected = true;
 
             // OnNetworkJoined needs to be synchronized
             if (joinState.mainSyncCtx != null)
@@ -151,18 +156,20 @@ using P2pNet;
 
         public void OnListenAddress(List<string> addresses)
         {
-            // We get this when we have connected to the realy and have been assigned a proxy
-            //  "listen" address. At this point if we created the group and theso there are no other
-            // members ( so connectOpts["dialid"] is the empty string), then we can consider
-            // ourtselves "connected" to the group's network
+            // We get this when we have connected to the relay and have been assigned a proxy
+            //  "listen" address. At this point we can consider ourtselves "connected" to the
+            // group's network, tho we probaly don;t ahve any connections yet.
+            // Since this is NOT a brokered pubsub, if there are no peers then sending messages doesn;t do
+            // anything at all.
             if (addresses.Count > 0)
             {
-                if (!IsConnected)
+                if ( joinState.IsConnected == false)
                 {
-                    ListenAddress = addresses[0];
-
-                    _reportConnectedToNet();
-
+                    joinState.ListenAddress = addresses[0];
+                    _reportConnectedToNet(); // this results in subscribing to localPeerId and mainchannel
+                                             // It also sends an "I'm here" but it probably doesnt go anywhere
+                                             // because we probably aren't conected to anyone yet.
+                                             // Also sets IsCOnnected
                 }
             }
         }
@@ -172,18 +179,19 @@ using P2pNet;
         }
         public void OnConnectionEvent(Libp2pPeerId peerId, bool connected)
         {
-            //Log( $"\n{(connected ? "Connected to" : "Disconnected from")}  remote peer: {peerId.id}");
-            // if ( connected == true)
-            // {
-            //     if (IsConnected == false)
-            //     {
-            //         if (peerId.id == connectOpts["dialid"])
-            //         {
-            //             // we are now connected to a pubsub peer so can start talking
-            //             _reportConnectedToNet();
-            //         }
-            //     }
-            // }
+            // A peer has either connected or disconnected
+            logger.Verbose( $"\n{(connected ? "Connected to" : "Disconnected from")}  remote peer: {peerId.id}");
+            if ( connected == true) // the remote peer has connected
+            {
+                // SO NOW there's a peer connected. If we haven;t connected to anyone else (other than the relay) we should
+                // send a broadcast to tell everyone  we're here
+                if (joinState.IsConnected && peerId.id != connectOpts["relayid"]) // Note that the FIRST connection is the relay, but that's before we have a listen address
+                {
+                    string chId = joinState.mainChannel.id;
+                    joinState.p2pBase.SendHelloMsg(chId, chId); // resend
+                    joinState.HasPeers = true; //  Too optimistic?
+                }
+            }
 
         }
         public void OnMessage(string sourceId, string topic, string payload)
