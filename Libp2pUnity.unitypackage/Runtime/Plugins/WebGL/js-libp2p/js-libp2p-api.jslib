@@ -83,7 +83,7 @@ var JsLibp2pAPI = {
       var topic = UTF8ToString(c_topic)
       var message = UTF8ToString(c_message)
       JsLibp2p.Publish(clientId, topic, message)  // calls await, be we aren't waiting (TODO: should we?)
-      console.log(`JsLibp2p_Publish(${topic}, ${message})`)
+      //console.log(`JsLibp2p_Publish(${topic}, ${message})`)
    },
 
    JsLibp2p_Dial: function(c_clientId, c_peerAddr)
@@ -162,7 +162,7 @@ var JsLibp2pAPI = {
 
    JsLibp2p_OnMessage: function(clientId, sourceId, topic, msgStr)
    {
-       console.log(`*** About to call Unity message callback`)
+       //console.log(`*** About to call Unity message callback`)
        var c_clientId = allocate(intArrayFromString(clientId), ALLOC_NORMAL)
        var c_sourceId = allocate(intArrayFromString(sourceId), ALLOC_NORMAL)
        var c_topic = allocate(intArrayFromString(topic), ALLOC_NORMAL)

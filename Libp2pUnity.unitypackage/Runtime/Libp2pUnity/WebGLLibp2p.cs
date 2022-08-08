@@ -154,7 +154,7 @@ namespace Libp2pUnity
         [MonoPInvokeCallback(typeof(Action<string, string, string, string>))]
         public static void JsLibp2p_OnMessage_Cb(string libId, string sourceId, string topic, string msgStr)
         {
-            Debug.Log($"JsLibp2p_OnMessage_Cb() LibId: {libId} SourceId: {sourceId}, Topic: {topic}");
+            //Debug.Log($"JsLibp2p_OnMessage_Cb() LibId: {libId} SourceId: {sourceId}, Topic: {topic}");
             try {
                 LibInstances[libId].OnMessage(sourceId, topic, msgStr);
             } catch (Exception ex) {
@@ -337,7 +337,7 @@ namespace Libp2pUnity
 
         protected void OnMessage(string sourceId, string topic, string msgStr)
         {
-            Debug.Log($"WebGLLibp2p.OnMessage()");
+            //Debug.Log($"WebGLLibp2p.OnMessage()");
             Client.OnMessage( sourceId, topic, msgStr);
         }
 
