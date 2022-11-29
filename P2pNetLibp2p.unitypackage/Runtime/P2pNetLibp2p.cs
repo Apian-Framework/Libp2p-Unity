@@ -139,7 +139,7 @@ using P2pNet;
 
         protected void _reportConnectedToNet()
         {
-            Listen(joinState.p2pBase.GetId());
+            Listen(joinState.p2pBase.LocalId);
 
             joinState.IsConnected = true;
 
